@@ -1,20 +1,22 @@
-"""
-ITD105 - Big Data Analytics
-Lab Exercise #2 - Streamlit Web Application
-ML Model Deployment for Classification and Regression Tasks
-"""
-
 import streamlit as st
 import pandas as pd
 import joblib
 import numpy as np
+import sys
+from pathlib import Path
+
+# Add src to path for imports
+project_root = Path(__file__).parent
+sys.path.insert(0, str(project_root / "src"))
+
+from src.config import Config
+from src.utils import load_model
 
 # =============================================================================
 # 1. PAGE CONFIGURATION
 # =============================================================================
 st.set_page_config(
-    page_title="Big Data Analytics Lab 2",
-    page_icon="🔬",
+    page_title="Machine Learning using Streamlit",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -22,10 +24,7 @@ st.set_page_config(
 # =============================================================================
 # 2. MAIN TITLE
 # =============================================================================
-st.title('🔬 ML Model Deployment for Lab 2')
-st.markdown('### ITD105 - Big Data Analytics: Resampling Techniques & Performance Metrics')
-st.markdown('**Team Members:** Barnett, Gumora, Quilantang, Tadoy, Ventic')
-st.markdown('---')
+st.title('Machine Learning Model')
 
 # =============================================================================
 # 3. LOAD MODELS WITH CACHING
@@ -33,12 +32,12 @@ st.markdown('---')
 @st.cache_resource
 def load_classification_model():
     """Load the diabetes classification model"""
-    return joblib.load('classification_model.joblib')
+    return load_model(str(Config.CLASSIFICATION_MODEL))
 
 @st.cache_resource
 def load_regression_model():
     """Load the housing price regression model"""
-    return joblib.load('regression_model.joblib')
+    return load_model(str(Config.REGRESSION_MODEL))
 
 # Load models
 try:
@@ -60,14 +59,14 @@ tab1, tab2 = st.tabs(["📊 Part 1: Classification", "📈 Part 2: Regression"])
 with tab1:
     st.header('🏥 Pima Indians Diabetes Prediction')
     st.markdown('Predict diabetes onset based on diagnostic measurements.')
-    
+
     # Create columns for better layout
     col1, col2 = st.columns([1, 2])
-    
+
     with col1:
         st.subheader('📋 Patient Information')
         st.markdown('Enter patient diagnostic measurements:')
-        
+
         # Sidebar for Classification inputs
         with st.container():
             st.markdown('#### Basic Information')
@@ -85,7 +84,7 @@ with tab1:
                 value=25,
                 help='Age in years'
             )
-            
+
             st.markdown('#### Clinical Measurements')
             glucose = st.number_input(
                 'Glucose',
@@ -131,12 +130,12 @@ with tab1:
                 step=0.01,
                 help='Diabetes pedigree function (genetic influence)'
             )
-    
+
     with col2:
         st.subheader('🎯 Prediction Results')
-        
+
         # Create prediction button
-        if st.button('🔍 Predict Diabetes', type='primary', use_container_width=True):
+        if st.button('🔍 Predict Diabetes', type='primary', width='stretch'):
             # Prepare input data
             input_data = pd.DataFrame({
                 'Pregnancies': [pregnancies],
@@ -148,48 +147,48 @@ with tab1:
                 'DiabetesPedigreeFunction': [dpf],
                 'Age': [age]
             })
-            
+
             # Make prediction
             prediction = classification_model.predict(input_data)
             prediction_proba = classification_model.predict_proba(input_data)
-            
+
             # Display results
             st.markdown('---')
-            
+
             if prediction[0] == 1:
                 st.error('⚠️ **Prediction: Diabetic**')
                 confidence = prediction_proba[0][1] * 100
             else:
                 st.success('✅ **Prediction: Not Diabetic**')
                 confidence = prediction_proba[0][0] * 100
-            
+
             # Show confidence metrics
             col_a, col_b, col_c = st.columns(3)
-            
+
             with col_a:
                 st.metric(
                     label="Confidence Score",
                     value=f"{confidence:.2f}%"
                 )
-            
+
             with col_b:
                 st.metric(
                     label="Diabetes Probability",
                     value=f"{prediction_proba[0][1]*100:.2f}%"
                 )
-            
+
             with col_c:
                 st.metric(
                     label="Healthy Probability",
                     value=f"{prediction_proba[0][0]*100:.2f}%"
                 )
-            
+
             st.markdown('---')
-            
+
             # Display input summary
             with st.expander('📊 View Input Summary'):
-                st.dataframe(input_data, use_container_width=True)
-            
+                st.dataframe(input_data, width='stretch')
+
             # Clinical interpretation
             with st.expander('💡 Clinical Interpretation'):
                 st.markdown(f"""
@@ -199,15 +198,15 @@ with tab1:
                 - **Glucose Level:** {glucose} mg/dL {"(High)" if glucose > 140 else "(Normal)"}
                 - **Blood Pressure:** {blood_pressure} mm Hg {"(High)" if blood_pressure > 80 else "(Normal)"}
                 - **BMI:** {bmi:.1f} {"(Overweight)" if bmi > 25 else "(Normal)"}
-                
+
                 **Model Confidence:** {confidence:.2f}%
-                
-                **Note:** This prediction is for educational purposes only and should not replace 
+
+                **Note:** This prediction is for educational purposes only and should not replace
                 professional medical advice. Please consult with a healthcare provider for proper diagnosis.
                 """)
         else:
             st.info('👈 Enter patient data and click "Predict Diabetes" to see results.')
-            
+
             # Show example values
             with st.expander('📖 Feature Descriptions & Normal Ranges'):
                 st.markdown("""
@@ -229,14 +228,14 @@ with tab1:
 with tab2:
     st.header('🏠 Boston Housing Price Prediction')
     st.markdown('Predict median home value based on environmental and housing characteristics.')
-    
+
     # Create columns for better layout
     col1, col2 = st.columns([1, 2])
-    
+
     with col1:
         st.subheader('📋 Housing Information')
         st.markdown('Enter housing characteristics:')
-        
+
         with st.container():
             st.markdown('#### Crime & Zoning')
             crim = st.number_input(
@@ -269,7 +268,7 @@ with tab2:
                 format_func=lambda x: 'Yes' if x == 1 else 'No',
                 help='Whether tract bounds Charles River (1 = bounds river; 0 = otherwise)'
             )
-            
+
             st.markdown('#### Environmental Factors')
             nox = st.number_input(
                 'NOX - Nitric Oxides',
@@ -279,7 +278,7 @@ with tab2:
                 step=0.01,
                 help='Nitric oxides concentration (parts per 10 million)'
             )
-            
+
             st.markdown('#### Property Features')
             rm = st.number_input(
                 'RM - Average Rooms',
@@ -297,7 +296,7 @@ with tab2:
                 step=1.0,
                 help='Proportion of owner-occupied units built prior to 1940'
             )
-            
+
             st.markdown('#### Location & Access')
             dis = st.number_input(
                 'DIS - Distance to Employment',
@@ -329,7 +328,7 @@ with tab2:
                 step=0.1,
                 help='Pupil-teacher ratio by town'
             )
-            
+
             st.markdown('#### Demographics')
             b = st.number_input(
                 'B - Black Population Proportion',
@@ -347,12 +346,12 @@ with tab2:
                 step=0.1,
                 help='% lower status of the population'
             )
-    
+
     with col2:
         st.subheader('🎯 Prediction Results')
-        
+
         # Create prediction button
-        if st.button('🔍 Predict Housing Price', type='primary', use_container_width=True):
+        if st.button('🔍 Predict Housing Price', type='primary', width='stretch'):
             # Prepare input data
             input_data = pd.DataFrame({
                 'CRIM': [crim],
@@ -369,42 +368,42 @@ with tab2:
                 'B': [b],
                 'LSTAT': [lstat]
             })
-            
+
             # Make prediction
             prediction = regression_model.predict(input_data)
             predicted_price = prediction[0] * 1000  # Convert to actual dollars
-            
+
             # Display results
             st.markdown('---')
             st.success('✅ **Prediction Complete**')
-            
+
             # Show main prediction metric
             col_a, col_b, col_c = st.columns([2, 1, 1])
-            
+
             with col_a:
                 st.metric(
                     label="Predicted Housing Price",
                     value=f"${predicted_price:,.2f}"
                 )
-            
+
             with col_b:
                 st.metric(
                     label="Price per Room",
                     value=f"${predicted_price/rm:,.2f}"
                 )
-            
+
             with col_c:
                 st.metric(
                     label="Value (in $1000s)",
                     value=f"${prediction[0]:.2f}k"
                 )
-            
+
             st.markdown('---')
-            
+
             # Display input summary
             with st.expander('📊 View Input Summary'):
-                st.dataframe(input_data.T, use_container_width=True)
-            
+                st.dataframe(input_data.T, width='stretch')
+
             # Property analysis
             with st.expander('💡 Property Analysis'):
                 st.markdown(f"""
@@ -414,22 +413,22 @@ with tab2:
                 - **Property Age:** {age:.0f}% built pre-1940
                 - **Distance to Employment:** {dis:.1f} units
                 - **Environmental Quality (NOX):** {nox:.3f} ppm
-                
+
                 **Predicted Median Home Value:** ${predicted_price:,.2f}
-                
+
                 **Key Factors Influencing Price:**
                 - Number of rooms (RM): More rooms typically increase value
                 - Crime rate (CRIM): Lower crime rates increase value
                 - Environmental quality (NOX): Better air quality increases value
                 - Property tax rate (TAX): Can affect property values
                 - Lower status population (LSTAT): Higher percentages may decrease value
-                
-                **Note:** This prediction is based on historical Boston housing data and 
+
+                **Note:** This prediction is based on historical Boston housing data and
                 is for educational purposes. Actual prices may vary based on current market conditions.
                 """)
         else:
             st.info('👈 Enter housing characteristics and click "Predict Housing Price" to see results.')
-            
+
             # Show example values
             with st.expander('📖 Feature Descriptions & Typical Ranges'):
                 st.markdown("""
