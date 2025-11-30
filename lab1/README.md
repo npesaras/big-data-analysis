@@ -2,8 +2,6 @@
 
 A comprehensive Exploratory Data Analysis (EDA) dashboard for student exam performance built with Streamlit, as part of the ITD105 Big Data Analytics course.
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/)
-
 ## ✨ Features
 
 - 📊 **Interactive Dashboard**: Complete EDA with multiple visualization types
