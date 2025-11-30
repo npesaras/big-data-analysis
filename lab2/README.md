@@ -96,7 +96,7 @@ lab2/
 1. **Clone the repository**
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/npesaras/big-data-analysis.git
    cd lab2
    ```
 
@@ -182,7 +182,7 @@ python scripts/train_regression.py
 
 ## 📁 Project Structure
 
-```
+```text
 lab2/
 ├── .python-version          # Python version specification
 ├── pyproject.toml          # Project configuration & dependencies
