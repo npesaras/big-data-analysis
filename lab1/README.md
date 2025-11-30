@@ -205,8 +205,3 @@ If you encounter issues:
 **Course**: ITD105 - Big Data Analytics
 **Lab Exercise**: #1 - Student Performance Analysis
 **Objective**: Build an interactive EDA dashboard using Streamlit
-
----
-
-Happy analyzing! 📊✨
-
