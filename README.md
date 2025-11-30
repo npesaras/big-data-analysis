@@ -209,12 +209,6 @@ big-data-analysis/
 
 ---
 
-## 📚 Course Information
-
-**Course**: ITD105 - Big Data Analytics
-**Institution**: [Your Institution Name]
-**Semester**: [Current Semester]
-
 ### Lab Exercises
 
 1. **Lab 1**: Student Performance Analysis
