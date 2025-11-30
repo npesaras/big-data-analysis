@@ -1,244 +1,212 @@
-# ITD105 - Big Data Analytics Lab Exercise #1
+# Student Performance Analysis Dashboard
 
-## Student Performance Analysis Dashboard
+A comprehensive Exploratory Data Analysis (EDA) dashboard for student exam performance built with Streamlit, as part of the ITD105 Big Data Analytics course.
 
-This project implements a comprehensive Exploratory Data Analysis (EDA) dashboard for student exam performance using Streamlit, as part of the ITD105 Big Data Analytics course.
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/)
 
-## 📋 Lab Requirements
+## ✨ Features
 
-### Run the program
-
-- python -m streamlit run student_performance.py
-
-### Demo Video
-https://github.com/user-attachments/assets/30f25138-9d22-4c1d-92b5-a08ca1ab16ae
-### Basic Requirements
-
-- [x] Load the dataset into the Streamlit app
-- [x] Display the first few rows of the dataset
-- [x] Show dataset information (data types, missing values)
-- [x] Generate summary statistics for the dataset
-- [x] Create a heatmap to visualize correlations between features
-- [x] Display a boxplot for exploratory visualization of numeric features
-- [x] Use Plotly to create an interactive scatter plot of student performance
-
-### Grade Booster Features
-
-- [x] Interactive widgets for filtering (gender, age, parental education)
-- [x] Additional visualization techniques (bar charts, pair plots)
-- [x] Dashboard-style layout with tabs, columns, and filtering widgets
+- 📊 **Interactive Dashboard**: Complete EDA with multiple visualization types
+- 🔍 **Data Exploration**: Dataset overview, statistics, and correlations
+- 📈 **Visual Analytics**: Heatmaps, boxplots, scatter plots, and pair plots
+- 🎯 **Lab Analysis**: Automated analysis of course lab questions
+- 🔧 **Smart Filtering**: Filter by gender, age, and parental education
+- 📱 **Responsive Design**: Works on desktop and mobile devices
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Python 3.7 or higher
-- pip package manager
+- **Python 3.12 or higher**
+- **uv** package manager (modern Python packaging)
 
-### Installation
+### 1. Install uv
 
-1. **Clone or download this repository**
+**On macOS/Linux:**
 
-   ```bash
-   git clone <your-repo-url>
-   cd Lab1_bigData
-   ```
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
 
-2. **Install required packages**
+**On Windows:**
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.sh | iex"
+```
 
-3. **Download the dataset**
+**Verify installation:**
 
-   - Download `student-mat.csv` from: https://drive.google.com/drive/folders/1Bz9q37BB20PJSWsdGH__cshZGfPKSpHd?usp=sharing
-   - Place the file in the same directory as `student_performance.py`
+```bash
+uv --version
+```
 
-4. **Run the application**
+### 2. Clone and Setup Project
 
-   ```bash
-   streamlit run student_performance.py
-   ```
+```bash
+# Navigate to the lab1 directory
+cd lab1
 
-5. **Open your browser**
-   - The app will automatically open at `http://localhost:8501`
-   - If it doesn't open automatically, copy the URL from the terminal
+# Install dependencies using uv
+uv pip install -r requirements.txt
+```
 
-## 📊 Features
+### 3. Download Dataset
 
-### Dashboard Tabs
+Download the `student-mat.csv` dataset from:
+[Google Drive Link](https://drive.google.com/drive/folders/1Bz9q37BB20PJSWsdGH__cshZGfPKSpHd?usp=sharing)
+
+Place the file in the `data/` directory.
+
+### 4. Run the Application
+
+```bash
+# Run with uv
+uv run streamlit run main.py
+```
+
+The app will open at `http://localhost:8501` in your browser.
+
+## 📋 Dashboard Overview
+
+### Navigation Tabs
 
 1. **📋 Dataset Info**
-
-   - Dataset overview (rows, columns, memory usage)
-   - Data types and null value counts
-   - First 10 rows preview
+   - Dataset summary (rows, columns, memory usage)
+   - Data types and missing values overview
+   - Preview of first 10 rows
 
 2. **📈 Statistics**
-
-   - Comprehensive summary statistics
+   - Comprehensive statistical summary
    - Mean, median, standard deviation, quartiles
 
 3. **🔥 Correlations**
-
    - Interactive correlation heatmap
-   - Detailed correlation analysis with exam scores
-   - Top positive and negative correlations
+   - Feature correlation analysis with exam scores
+   - Top positive/negative correlations
 
 4. **📊 Visualizations**
-
-   - Customizable boxplots
+   - Customizable boxplots for numeric features
    - Gender distribution charts
    - Pair plot analysis
 
 5. **🎯 Interactive Analysis**
    - Interactive scatter plots with Plotly
-   - Lab questions analysis
-   - Gender impact analysis
+   - Automated lab questions analysis
+   - Gender impact on performance
 
 ### Interactive Filters
 
-- **Gender Filter**: Filter data by student gender
-- **Age Range**: Slider to filter by age range
-- **Parental Education**: Filter by mother's and father's education levels
+- **Gender**: Filter by male/female students
+- **Age Range**: Select age range with slider
+- **Parental Education**: Filter by mother/father education levels
 
 ## 🔍 Lab Questions Analysis
 
-The dashboard automatically analyzes and answers the lab questions:
+The dashboard automatically addresses the course lab requirements:
 
-### a. Highest Correlations with Exam Scores
+### A. Feature Correlations with Exam Scores
 
-- Identifies features with strongest correlations to G1, G2, G3
-- Shows both positive and negative correlations
+Identifies which features have the strongest relationships with G1, G2, and G3 exam scores.
 
-### b. Study Time vs Performance
+### B. Study Time Impact
 
-- Calculates correlation between study time and exam performance
-- Provides interactive visualization
+Analyzes how study time correlates with academic performance.
 
-### c. Boxplot Insights
+### C. Boxplot Insights
 
-- Explains what insights can be drawn from boxplot analysis
-- Identifies outliers, distribution patterns, and data spread
+Explains distribution patterns, outliers, and data spread from boxplot visualizations.
 
-### d. Gender Impact Analysis
+### D. Gender Differences
 
-- Compares exam performance between genders
-- Shows statistical differences (mean, median, std dev)
+Compares exam performance statistics between male and female students.
 
-## 🛠️ Technical Implementation
+## 🛠️ Technical Details
 
-### Libraries Used
+### Built With
 
-- **Streamlit**: Web application framework
-- **Pandas**: Data manipulation and analysis
-- **Matplotlib & Seaborn**: Static visualizations
-- **Plotly**: Interactive visualizations
-- **NumPy**: Numerical computing
+- **Streamlit** - Web app framework
+- **Pandas** - Data manipulation
+- **Plotly** - Interactive visualizations
+- **Matplotlib/Seaborn** - Static plots
+- **NumPy** - Numerical computing
 
 ### Key Features
 
-- **Caching**: Data loading is cached for better performance
-- **Responsive Design**: Mobile-friendly layout
-- **Error Handling**: Graceful handling of missing datasets
-- **Custom Styling**: Professional dashboard appearance
+- ⚡ **Performance Optimized**: Uses Streamlit caching for fast loading
+- 🎨 **Professional UI**: Custom CSS styling and responsive layout
+- 🛡️ **Error Handling**: Graceful handling of missing data
+- 📊 **Data Validation**: Automatic data type checking and conversion
 
 ## 📁 Project Structure
 
+```text
+lab1/
+├── main.py                 # Main Streamlit application
+├── pyproject.toml          # Project configuration
+├── requirements.txt        # Python dependencies
+├── README.md              # This documentation
+├── data/
+│   └── student-mat.csv    # Dataset (download separately)
+├── docs/
+│   └── laboratory-analysis.md
+└── assets/                # Static assets
 ```
-Lab1_bigData/
-├── student_performance.py    # Main Streamlit application
-├── requirements.txt          # Python dependencies
-├── README.md                # This file
-├── ITD105-–-Lab-Exercises-_1.csv  # Lab instructions
-└── student-mat.csv          # Dataset (download separately)
-```
-
-## 🎯 Usage Instructions
-
-1. **Start the Application**
-
-   ```bash
-   streamlit run student_performance.py
-   ```
-
-2. **Navigate the Dashboard**
-
-   - Use the sidebar filters to explore different data subsets
-   - Switch between tabs to see different analyses
-   - Interact with plots by hovering, zooming, and selecting
-
-3. **Answer Lab Questions**
-
-   - Go to the "🎯 Interactive Analysis" tab
-   - Review the automatic analysis of each lab question
-   - Use the interactive visualizations to explore further
-
-4. **Record Your Video**
-   - Use screen recording software to capture your dashboard
-   - Show the key features and analysis results
-   - Keep the video under 2 minutes as required
-
-## 📝 Submission Requirements
-
-1. **Source Code**: Submit the `student_performance.py` file
-2. **Video Recording**: 2-minute screen recording showing:
-   - Dataset loading and basic information
-   - Correlation analysis
-   - Interactive visualizations
-   - Lab questions analysis
 
 ## 🔧 Troubleshooting
 
 ### Common Issues
 
-1. **Dataset Not Found**
+**"Dataset not found" error:**
 
-   - Ensure `student-mat.csv` is in the same directory as the Python file
-   - Check the file name is exactly `student-mat.csv`
+- Ensure `student-mat.csv` is placed in the `data/` directory
+- Verify the filename matches exactly
 
-2. **Import Errors**
+**Import errors:**
 
-   - Run `pip install -r requirements.txt` to install all dependencies
-   - Ensure you're using Python 3.7 or higher
+```bash
+# Reinstall dependencies
+uv pip install -r requirements.txt
+```
 
-3. **Port Already in Use**
+**Port already in use:**
 
-   - If port 8501 is busy, Streamlit will automatically use the next available port
-   - Check the terminal output for the correct URL
+- Streamlit will automatically use the next available port
+- Check terminal output for the correct URL
 
-4. **Memory Issues**
-   - The app uses caching to optimize performance
-   - If you encounter memory issues, restart the application
+**Python version issues:**
 
-## 🎓 Learning Outcomes
+- Ensure you're using Python 3.12 or higher
+- Check with: `python --version`
 
-After completing this lab, you will understand:
+### Performance Tips
 
-- How to build interactive data analysis dashboards with Streamlit
-- Exploratory Data Analysis techniques and best practices
-- Correlation analysis and statistical interpretation
-- Data visualization principles and interactive plotting
-- Dashboard design and user experience considerations
+- The app uses caching to optimize performance
+- For large datasets, consider filtering data in the sidebar first
+- Close unused browser tabs to free memory
 
 ## 📚 Additional Resources
 
 - [Streamlit Documentation](https://docs.streamlit.io/)
-- [Pandas Documentation](https://pandas.pydata.org/docs/)
-- [Plotly Documentation](https://plotly.com/python/)
-- [Seaborn Documentation](https://seaborn.pydata.org/)
+- [uv Package Manager](https://docs.astral.sh/uv/)
+- [Pandas User Guide](https://pandas.pydata.org/docs/user_guide/)
+- [Plotly Python](https://plotly.com/python/)
 
 ## 🤝 Support
 
-If you encounter any issues or have questions:
+If you encounter issues:
 
 1. Check the troubleshooting section above
-2. Review the error messages in the terminal
-3. Ensure all dependencies are properly installed
-4. Verify the dataset file is correctly placed
+2. Verify all prerequisites are installed
+3. Ensure the dataset file is correctly placed
+4. Review error messages in the terminal
+
+## 📝 Course Information
+
+**Course**: ITD105 - Big Data Analytics
+**Lab Exercise**: #1 - Student Performance Analysis
+**Objective**: Build an interactive EDA dashboard using Streamlit
 
 ---
 
-**Good luck with your ITD105 lab exercise! 🚀**
+Happy analyzing! 📊✨
 
