@@ -115,13 +115,13 @@ Comprehensive guides available in `docs/`:
 
 ---
 
-## 📖 Usage
+## Usage
 
 ### Web Application
 
 The Streamlit application provides diabetes risk prediction:
 
-#### 🏥 Diabetes Prediction
+#### Diabetes Prediction
 
 - Input patient diagnostic measurements
 - Get real-time diabetes risk assessment
@@ -239,7 +239,7 @@ setup_logging(level='INFO', log_file='training.log')
 
 ---
 
-## 🛠️ Development
+## Development
 
 ### Environment Setup
 
