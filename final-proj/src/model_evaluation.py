@@ -339,7 +339,6 @@ def generate_classification_report_dict(y_test: pd.Series,
     Returns:
         Dictionary with classification report
     """
-    from sklearn.metrics import classification_report
 
     report_dict = classification_report(y_test, y_pred, output_dict=True)
 
