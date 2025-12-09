@@ -1,6 +1,5 @@
 """
 Real-Time Dynamic ML Training System for Diabetes Classification
-Final Version: Sidebar Inputs + Fixed Icon Warnings
 """
 
 import streamlit as st
@@ -83,12 +82,12 @@ if 'dataset_info' not in st.session_state:
 # 3. SIDEBAR: CONFIGURATION & INPUTS
 # =============================================================================
 with st.sidebar:
-    st.title("🏥 Diabetes ML")
+    st.title("Diabetes ML")
     st.caption("Configuration & Input")
     st.markdown("---")
 
     # ========= A. SYSTEM SETTINGS =========
-    st.subheader("⚙️ System Settings")
+    st.subheader("System Settings")
 
     with st.expander("Model Configuration", expanded=False):
         train_size = st.slider("Train Size (%)", 60, 90, 80, 5)
@@ -100,7 +99,7 @@ with st.sidebar:
     st.markdown("---")
 
     # ========= B. PATIENT DIAGNOSTICS =========
-    st.subheader("📋 Patient Diagnostics")
+    st.subheader("Patient Diagnostics")
 
     with st.form("patient_data_form"):
         st.caption("Enter patient metrics below:")
@@ -167,7 +166,7 @@ with st.sidebar:
 # =============================================================================
 
 # Header Section
-st.title('🏥 Diabetes Classification System')
+st.title('Diabetes Classification System')
 st.markdown("### Real-Time Dynamic ML Training & Prediction")
 
 # Logic to handle view
@@ -190,7 +189,7 @@ if predict_button:
     }
 
     # Execute full ML pipeline
-    with st.spinner('🔄 Processing: Training 9 Algorithms & Analyzing Patient Data...'):
+    with st.spinner('Processing: Training 9 Algorithms & Analyzing Patient Data...'):
         results = run_full_pipeline(
             patient_data=patient_data,
             train_size=train_size / 100,
@@ -207,10 +206,10 @@ if predict_button:
     # Display results
     if results['success']:
         with st.container(border=True):
-            st.subheader("🎯 Analysis Report")
+            st.subheader("Analysis Report")
             display_results(results, patient_data, train_size / 100)
     else:
-        st.error(f"❌ Pipeline failed: {results['error']}")
+        st.error(f"Pipeline failed: {results['error']}")
 
 else:
     # ---------------------------------------------------------
@@ -219,11 +218,11 @@ else:
     st.divider()
 
     # Hero Section Message
-    st.info('👈 **Action Required:** Please enter patient diagnostics in the sidebar and click "Run Analysis".')
+    st.info('**Action Required:** Please enter patient diagnostics in the sidebar and click "Run Analysis".')
 
     # Visual Guide
     with st.container(border=True):
-        st.markdown("### 🧬 System Architecture")
+        st.markdown("### System Architecture")
 
         col_step1, col_step2, col_step3 = st.columns(3)
 
