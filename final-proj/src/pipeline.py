@@ -63,7 +63,7 @@ def run_full_pipeline(
 
     try:
         # ========= STEP 1: LOAD DATA =========
-        status_text.text('📂 Step 1/7: Loading diabetes dataset...')
+        status_text.text('Step 1/7: Loading diabetes dataset...')
         df = load_diabetes_data(config.DIABETES_DATA)
 
         if df is None:
@@ -85,7 +85,7 @@ def run_full_pipeline(
         time.sleep(0.3)
 
         # ========= STEP 2: DATA EXPLORATION =========
-        status_text.text('🔍 Step 2/7: Exploring data...')
+        status_text.text('Step 2/7: Exploring data...')
         st.caption(f"✓ Loaded {total_samples} patient records")
         st.caption(f"✓ Features: {len(config.FEATURE_COLUMNS)}, Target: Outcome (0/1)")
         st.caption(f"✓ Diabetic cases: {df[config.TARGET_COLUMN].sum()}, Healthy: {(df[config.TARGET_COLUMN] == 0).sum()}")
@@ -94,7 +94,7 @@ def run_full_pipeline(
         time.sleep(0.3)
 
         # ========= STEP 3: SPLIT DATA =========
-        status_text.text('✂️ Step 3/7: Splitting data into train/test sets...')
+        status_text.text('Step 3/7: Splitting data into train/test sets...')
         X = df[config.FEATURE_COLUMNS]
         y = df[config.TARGET_COLUMN]
 
@@ -112,7 +112,7 @@ def run_full_pipeline(
         time.sleep(0.3)
 
         # ========= STEP 4: PREPROCESSING =========
-        status_text.text('⚙️ Step 4/7: Preprocessing (handling zeros, imputation, scaling)...')
+        status_text.text('Step 4/7: Preprocessing (handling zeros, imputation, scaling)...')
 
         # Prepare training data for preprocessing
         train_df = X_train.copy()
@@ -146,7 +146,7 @@ def run_full_pipeline(
         time.sleep(0.3)
 
         # ========= STEP 5: MODEL TRAINING =========
-        status_text.text('🎓 Step 5/7: Training all 9 machine learning algorithms...')
+        status_text.text('Step 5/7: Training all 9 machine learning algorithms...')
 
         # Create models with dynamic K-neighbors
         models = create_all_models(config.MODELS_CONFIG, k_neighbors=k_neighbors)
@@ -171,7 +171,7 @@ def run_full_pipeline(
         time.sleep(0.3)
 
         # ========= STEP 6: EVALUATION =========
-        status_text.text('📊 Step 6/7: Evaluating models on test set...')
+        status_text.text('Step 6/7: Evaluating models on test set...')
 
         # Evaluate all models
         eval_results = evaluate_all_models(
@@ -191,7 +191,7 @@ def run_full_pipeline(
         time.sleep(0.3)
 
         # ========= STEP 7: PREDICTION =========
-        status_text.text('🎯 Step 7/7: Making predictions for patient data...')
+        status_text.text('Step 7/7: Making predictions for patient data...')
 
         # Prepare patient data
         patient_df = pd.DataFrame([patient_data])
@@ -286,9 +286,26 @@ def display_results(
     X_test = results['X_test']
     y_test = results['y_test']
 
+    # ========= PREDICTION FOR THIS PATIENT =========
+    st.markdown("---")
+    st.subheader("Prediction for This Patient")
+
+    best_pred = patient_predictions[best_model_name]
+
+    if best_pred['prediction'] == 1:
+        st.error(f"**Prediction: {best_pred['prediction_label']}**")
+    else:
+        st.success(f"**Prediction: {best_pred['prediction_label']}**")
+
+    if best_pred['confidence'] is not None:
+        col_a, col_b, col_c = st.columns(3)
+        col_a.metric("Confidence", f"{best_pred['confidence']:.1f}%")
+        col_b.metric("Diabetes Probability", f"{best_pred['diabetes_probability']:.1f}%")
+        col_c.metric("Healthy Probability", f"{100 - best_pred['diabetes_probability']:.1f}%")
+
     # ========= BEST MODEL SECTION =========
     st.markdown("---")
-    st.subheader("🏆 Best Performing Model")
+    st.subheader("Best Performing Model")
 
     best_model_metrics = eval_results[best_model_name]
 
@@ -298,33 +315,16 @@ def display_results(
     with col2:
         st.metric("Test Accuracy", f"{best_model_metrics['accuracy']:.2%}")
     with col3:
-        st.metric("Precision", f"{best_model_metrics['precision']:.2%}")
-    with col4:
         st.metric("Recall", f"{best_model_metrics['recall']:.2%}")
+    with col4:
+        st.metric("Precision", f"{best_model_metrics['precision']:.2%}")
 
-    st.info(f"📊 Trained on {dataset_info['train']} samples ({dataset_info['train_pct']:.0f}%), "
+    st.info(f"Trained on {dataset_info['train']} samples ({dataset_info['train_pct']:.0f}%), "
             f"tested on {dataset_info['test']} samples ({dataset_info['test_pct']:.0f}%)")
-
-    # ========= PREDICTION FOR THIS PATIENT =========
-    st.markdown("---")
-    st.subheader("🎯 Prediction for This Patient")
-
-    best_pred = patient_predictions[best_model_name]
-
-    if best_pred['prediction'] == 1:
-        st.error(f"⚠️ **Prediction: {best_pred['prediction_label']}**")
-    else:
-        st.success(f"✅ **Prediction: {best_pred['prediction_label']}**")
-
-    if best_pred['confidence'] is not None:
-        col_a, col_b, col_c = st.columns(3)
-        col_a.metric("Confidence", f"{best_pred['confidence']:.1f}%")
-        col_b.metric("Diabetes Probability", f"{best_pred['diabetes_probability']:.1f}%")
-        col_c.metric("Healthy Probability", f"{100 - best_pred['diabetes_probability']:.1f}%")
 
     # ========= ALL MODELS COMPARISON =========
     st.markdown("---")
-    st.subheader("📊 All 9 Algorithms Comparison")
+    st.subheader("All 9 Algorithms Comparison")
 
     # Create prediction comparison DataFrame
     from src.model_evaluation import create_prediction_comparison_df
@@ -358,7 +358,7 @@ def display_results(
 
     # ========= VISUAL COMPARISON =========
     st.markdown("---")
-    st.subheader("📈 Visual Comparisons")
+    st.subheader("Visual Comparisons")
 
     # Bar chart for diabetes probabilities
     from src.model_evaluation import plot_diabetes_probability_chart
@@ -390,9 +390,9 @@ def display_results(
 
     # ========= CLINICAL INTERPRETATION =========
     st.markdown("---")
-    st.subheader("💡 Clinical Interpretation")
+    st.subheader("Clinical Interpretation")
 
-    with st.expander("📋 View Detailed Analysis", expanded=True):
+    with st.expander("View Detailed Analysis", expanded=True):
         st.markdown(f"""
         ### Patient Profile
 
@@ -429,21 +429,22 @@ def display_results(
         # Identify risk factors
         risk_factors = []
         if patient_data['Glucose'] > 140:
-            risk_factors.append("- High glucose level (>140 mg/dL)")
+            risk_factors.append("- **High glucose level** (>140 mg/dL)")
         if patient_data['BMI'] >= 30:
-            risk_factors.append("- Obesity (BMI ≥ 30)")
+            risk_factors.append("- **Obesity** (BMI ≥ 30)")
         elif patient_data['BMI'] >= 25:
-            risk_factors.append("- Overweight (BMI ≥ 25)")
+            risk_factors.append("- **Overweight** (BMI ≥ 25)")
         if patient_data['BloodPressure'] > 90:
-            risk_factors.append("- High blood pressure (>90 mm Hg)")
+            risk_factors.append("- **High blood pressure** (>90 mm Hg)")
         if patient_data['Age'] > 45:
-            risk_factors.append("- Age over 45 years")
+            risk_factors.append("- **Age over 45 years**")
         if patient_data['DiabetesPedigreeFunction'] > 0.5:
-            risk_factors.append("- High genetic predisposition")
+            risk_factors.append("- **High genetic predisposition**")
 
         if risk_factors:
             for factor in risk_factors:
                 st.markdown(factor)
+                st.write("") # Add spacing
         else:
             st.markdown("- No major risk factors identified")
 
@@ -456,19 +457,28 @@ def display_results(
         if best_pred['prediction'] == 1:
             st.markdown("""
             - 🏥 **Consult a healthcare provider** for proper diabetes screening
-            - 🩺 Consider HbA1c test and fasting glucose test
-            - 🍎 Implement dietary changes (reduce sugar, increase fiber)
-            - 🏃 Increase physical activity (150+ minutes/week)
-            - ⚖️ Monitor weight and aim for healthy BMI
-            - 📊 Regular blood glucose monitoring
+
+            - 🩺 **Consider HbA1c test** and fasting glucose test
+
+            - 🍎 **Implement dietary changes** (reduce sugar, increase fiber)
+
+            - 🏃 **Increase physical activity** (150+ minutes/week)
+
+            - ⚖️ **Monitor weight** and aim for healthy BMI
+
+            - 📊 **Regular blood glucose monitoring**
             """)
         else:
             st.markdown("""
-            - ✅ Maintain healthy lifestyle and regular checkups
-            - 🍎 Continue balanced diet
-            - 🏃 Stay physically active
-            - ⚖️ Maintain healthy weight
-            - 📅 Annual health screenings recommended
+            - ✅ **Maintain healthy lifestyle** and regular checkups
+
+            - 🍎 **Continue balanced diet**
+
+            - 🏃 **Stay physically active**
+
+            - ⚖️ **Maintain healthy weight**
+
+            - 📅 **Annual health screenings recommended**
             """)
 
         st.markdown("""
@@ -479,7 +489,7 @@ def display_results(
 
     # ========= DOWNLOAD OPTIONS =========
     st.markdown("---")
-    st.subheader("📥 Download Results")
+    st.subheader("Download Results")
 
     col_down1, col_down2 = st.columns(2)
 
@@ -487,7 +497,7 @@ def display_results(
         # Download comparison table as CSV
         csv = pred_comparison_df.to_csv(index=False)
         st.download_button(
-            label="📊 Download Comparison Table (CSV)",
+            label="Download Comparison Table (CSV)",
             data=csv,
             file_name="diabetes_prediction_comparison.csv",
             mime="text/csv"
@@ -505,7 +515,7 @@ def display_results(
 
         patient_csv = patient_results.to_csv(index=False)
         st.download_button(
-            label="📋 Download Patient Results (CSV)",
+            label="Download Patient Results (CSV)",
             data=patient_csv,
             file_name="patient_diabetes_prediction.csv",
             mime="text/csv"
