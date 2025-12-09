@@ -450,10 +450,19 @@ def create_prediction_comparison_df(
         eval_res = eval_results[model_name]
         pred_res = patient_predictions.get(model_name, {})
 
+        # Add icon to prediction label
+        pred_label = pred_res.get('prediction_label', 'N/A')
+        if pred_label == 'Diabetic':
+            pred_label_with_icon = '🔴 Diabetic'
+        elif pred_label == 'Not Diabetic':
+            pred_label_with_icon = '🟢 Not Diabetic'
+        else:
+            pred_label_with_icon = pred_label
+
         row = {
             'Model': model_name,
             'Test Accuracy': eval_res.get('accuracy', 0),
-            'Prediction': pred_res.get('prediction_label', 'N/A'),
+            'Prediction': pred_label_with_icon,
             'Diabetes Prob': pred_res.get('diabetes_probability', 0) if pred_res.get('diabetes_probability') is not None else 0,
             'Confidence': pred_res.get('confidence', 0) if pred_res.get('confidence') is not None else 0
         }
@@ -521,7 +530,7 @@ def plot_diabetes_probability_chart(patient_predictions: Dict[str, Dict]):
     )
 
     fig.update_layout(
-        title='Diabetes Probability by Algorithm',
+        title='Model Agreement: Probability of Diabetes',
         xaxis_title='Algorithm',
         yaxis_title='Diabetes Probability (%)',
         yaxis=dict(range=[0, 100]),
