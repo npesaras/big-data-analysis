@@ -13,6 +13,14 @@ Machine learning pipeline for diabetes prediction using the PIMA Indians Diabete
 
 ## Quick Start
 
+### Deployed URL
+
+open this url on your browser
+
+```url
+https://diabetes-classification-model.streamlit.app/
+```
+
 ### Installation
 
 ```bash
@@ -262,10 +270,6 @@ Follow PEP 8, add type hints, update docs, maintain modular architecture.
 ## License
 
 MIT License - See [LICENSE](LICENSE) file for details.
-
-## Authors
-
-**Nilmar Pesaras** - *ITD105 Big Data Analytics Project*
 
 ## Acknowledgments
 
