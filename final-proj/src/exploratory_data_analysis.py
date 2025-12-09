@@ -7,9 +7,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import seaborn as sns
-import matplotlib.pyplot as plt
-from typing import Dict, List, Tuple
+from typing import List
 import logging
 
 logger = logging.getLogger(__name__)
