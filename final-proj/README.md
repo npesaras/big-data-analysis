@@ -1,130 +1,117 @@
-# ITD105 - Big Data Analytics Lab Exercise #2
+# Diabetes Classification System
 
-A comprehensive implementation of classification and regression models using advanced resampling techniques, featuring a modular architecture that separates data processing from model training for better maintainability and scalability.
+Machine learning pipeline for diabetes prediction using the PIMA Indians Diabetes Dataset. Implements 9 classification algorithms with comprehensive preprocessing, cross-validation, and a Streamlit web interface.
 
----
+## Features
 
-## 📋 Table of Contents
+- **9 ML Algorithms**: Logistic Regression, Decision Tree, Random Forest, Naive Bayes, KNN, SVM, AdaBoost, Perceptron, MLP
+- **Robust Preprocessing**: Zero handling, median imputation, StandardScaler normalization
+- **Stratified 10-Fold CV**: Reliable performance estimation with confidence intervals
+- **Streamlit Web App**: Interactive patient data input with real-time predictions
+- **Modular Architecture**: Clean separation of concerns across 10 Python modules
+- **Production Ready**: Model persistence, preprocessor saving, reproducible pipeline
 
-- [Features](#features)
-- [Architecture](#architecture)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Project Structure](#project-structure)
-- [Models & Datasets](#models--datasets)
-- [API Reference](#api-reference)
-- [Development](#development)
-- [Contributing](#contributing)
-- [License](#license)
+## Quick Start
 
----
+### Installation
 
-## ✨ Features
+```bash
+# Clone repository
+git clone https://github.com/npesaras/big-data-analysis.git
+cd big-data-analysis/final-proj
 
-### 🔬 Machine Learning Tasks
+# Install uv package manager
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-- **Diabetes Classification**: Binary classification using PIMA Indians Diabetes Dataset
-- **Housing Price Regression**: Regression analysis using Boston Housing Dataset
-
-### 🏗️ Advanced Architecture
-
-- **Modular Design**: Complete separation of data cleaning and model training
-- **Configuration Management**: Centralized path and parameter management
-- **Error Handling**: Comprehensive logging and exception management
-- **Type Safety**: Full type hints throughout the codebase
-
-### 📊 Resampling Techniques
-
-- **K-Fold Cross-Validation** (10 folds) for robust classification evaluation
-- **Leave-One-Out Cross-Validation** for maximum training data utilization
-- **Repeated K-Fold Cross-Validation** (10×3) for stable regression metrics
-
-### 🎯 Performance Metrics
-
-- **Classification**: Accuracy, Log Loss, ROC AUC, Confusion Matrix
-- **Regression**: MAE, MSE, RMSE, R² with confidence intervals
-
-### 🌐 Web Interface
-
-- **Interactive Streamlit App**: User-friendly prediction interface
-- **Real-time Predictions**: Instant model inference
-- **Responsive Design**: Mobile and desktop optimized
-
----
-
-## 🏗️ Architecture
-
-### Modular Design Philosophy
-
-```
-lab2/
-├── src/                    # Core business logic
-│   ├── __init__.py        # Package metadata
-│   ├── config.py          # Centralized configuration
-│   ├── data_cleaning.py   # Data loading & preprocessing
-│   ├── models.py          # Model creation & evaluation
-│   └── utils.py           # Helper functions
-├── scripts/               # Training orchestration
-│   ├── train_classification.py
-│   └── train_regression.py
-├── models/                # Trained model artifacts
-├── data/                  # Raw datasets
-└── main.py               # Streamlit application
+# Install dependencies
+uv sync
 ```
 
-### Separation of Concerns
+### Run Application
 
-| Component | Responsibility | Key Functions |
-|-----------|----------------|----------------|
-| `config.py` | Configuration management | Path definitions, hyperparameters |
-| `data_cleaning.py` | Data processing | `load_diabetes_data()`, `load_housing_data()` |
-| `models.py` | ML operations | `create_*_pipeline()`, `evaluate_*_model()` |
-| `utils.py` | Utilities | `load_model()`, `save_model()`, logging |
-| `scripts/` | Training orchestration | End-to-end training workflows |
+```bash
+# Start Streamlit web app
+uv run streamlit run main.py
+```
+
+Open http://localhost:8501 in your browser.
+
+### Train Models
+
+```bash
+# Train classification models
+uv run python scripts/train_classification.py
+```
+
+## Project Structure
+
+```
+final-proj/
+├── main.py                  # Streamlit web application
+├── data/
+│   └── diabetes.csv         # PIMA Indians Diabetes dataset (768 samples)
+├── src/                     # Core modules (10 files)
+│   ├── config.py            # Configuration and hyperparameters
+│   ├── data_cleaning.py     # Data loading and inspection
+│   ├── exploratory_data_analysis.py  # Visualizations
+│   ├── pre_processing.py    # Preprocessing pipeline
+│   ├── data_splitting.py    # Train/test split, CV folds
+│   ├── model_selection.py   # 9 algorithm definitions
+│   ├── model_training.py    # Training procedures
+│   ├── model_evaluation.py  # Metrics and comparison
+│   └── utils.py             # Helper functions
+├── models/                  # Trained model artifacts (.joblib)
+├── docs/                    # Technical documentation
+│   ├── 00_installation.md   # Setup guide
+│   ├── 01_data_collection.md
+│   ├── 02_exploratory_analysis.md
+│   ├── 03_preprocessing.md
+│   ├── 04_data_splitting.md
+│   ├── 05_model_selection.md
+│   ├── 06_model_training.md
+│   ├── 07_model_evaluation.md
+│   └── 08_api_reference.md
+└── scripts/                 # Training scripts
+    └── train_classification.py
+```
 
 ---
 
-## 🚀 Installation
+## Dataset
 
-### Prerequisites
+**PIMA Indians Diabetes Database**
+- **Samples**: 768 female patients of Pima Indian heritage
+- **Features**: 8 clinical measurements (Pregnancies, Glucose, Blood Pressure, Skin Thickness, Insulin, BMI, Diabetes Pedigree Function, Age)
+- **Target**: Binary classification (0 = No Diabetes, 1 = Diabetes)
+- **Class Distribution**: 500 non-diabetic (65%) vs 268 diabetic (35%)
+- **Challenge**: Missing values encoded as zeros (Insulin: 49%, Skin Thickness: 30%)
 
-- **Python**: 3.13 or higher
-- **Package Manager**: uv (recommended) or pip
+## Model Performance
 
-### Quick Start
+Best performing models (10-fold CV Recall):
 
-1. **Clone the repository**
+| Model | Recall | Accuracy | Training Time |
+|-------|--------|----------|---------------|
+| Random Forest | 78.1% | 77.8% | ~2s |
+| MLP | 75.2% | 76.1% | ~9s |
+| Gaussian NB | 74.5% | 75.3% | <0.1s |
+| Logistic Regression | 74.1% | 75.8% | <0.2s |
 
-   ```bash
-   git clone https://github.com/npesaras/big-data-analysis.git
-   cd lab2
-   ```
+*Recall prioritized to minimize false negatives in medical diagnosis*
 
-2. **Install dependencies**
+## Technical Documentation
 
-   ```bash
-   # Using uv (recommended)
-   uv sync
+Comprehensive guides available in `docs/`:
 
-   # Or using pip
-   pip install -r requirements.txt
-   ```
-
-3. **Train models** (optional - pre-trained models included)
-
-   ```bash
-   # Train classification model
-   uv run python scripts/train_classification.py
-
-   # Train regression model
-   uv run python scripts/train_regression.py
-   ```
-
-4. **Launch the application**
-
-   ```bash
-   uv run streamlit run main.py
-   ```
+- **[Installation Guide](docs/00_installation.md)** - uv setup, environment configuration
+- **[Data Collection](docs/01_data_collection.md)** - Dataset loading, quality inspection
+- **[Exploratory Analysis](docs/02_exploratory_analysis.md)** - Visualizations, correlations
+- **[Preprocessing](docs/03_preprocessing.md)** - Zero handling, imputation, scaling
+- **[Data Splitting](docs/04_data_splitting.md)** - Stratified splits, cross-validation
+- **[Model Selection](docs/05_model_selection.md)** - Algorithm comparison (9 models)
+- **[Model Training](docs/06_model_training.md)** - Training procedures, CV
+- **[Model Evaluation](docs/07_model_evaluation.md)** - Metrics, confusion matrices
+- **[API Reference](docs/08_api_reference.md)** - Complete function documentation
 
 ---
 
@@ -132,19 +119,13 @@ lab2/
 
 ### Web Application
 
-The Streamlit application provides two main prediction interfaces:
+The Streamlit application provides diabetes risk prediction:
 
 #### 🏥 Diabetes Prediction
 
 - Input patient diagnostic measurements
 - Get real-time diabetes risk assessment
 - View confidence scores and clinical interpretation
-
-#### 🏠 Housing Price Prediction
-
-- Input property characteristics
-- Receive price estimates with confidence intervals
-- Analyze key factors influencing property values
 
 ### Programmatic Usage
 
@@ -167,119 +148,80 @@ pipeline.fit(X, y)
 # Make predictions
 predictions = pipeline.predict(X)
 ```
+## Key Technologies
 
-### Training Scripts
+- **Python 3.13+**: Core language
+- **scikit-learn 1.7.2**: Machine learning algorithms
+- **Streamlit 1.51.0**: Web application framework
+- **Pandas 2.3.3**: Data manipulation
+- **Plotly 6.5.0**: Interactive visualizations
+- **uv**: Fast Python package manager (Rust-based)
 
-```bash
-# Train individual models
-python scripts/train_classification.py
-python scripts/train_regression.py
+## Usage Examples
 
-# Models are automatically saved to models/ directory
+### Load and Preprocess Data
+
+```python
+from src.data_cleaning import load_diabetes_data
+from src.pre_processing import preprocess_pipeline
+
+# Load raw data
+df = load_diabetes_data()
+
+# Complete preprocessing (zeros → NaN → impute → scale)
+df_processed, preprocessors = preprocess_pipeline(df)
+```
+
+### Train Multiple Models
+
+```python
+from src.model_selection import create_all_models
+from src.model_training import train_all_models
+
+# Create 9 models
+models = create_all_models()
+
+# Train with 10-fold CV
+results = train_all_models(X_train, y_train, cv_folds=10, scoring='recall')
+
+# View results
+for name, metrics in results.items():
+    print(f"{name}: {metrics['cv_mean']:.3f} (+/- {metrics['cv_std']:.3f})")
+```
+
+### Make Predictions
+
+```python
+from src.utils import load_model, load_preprocessors
+
+# Load trained model and preprocessors
+model = load_model('models/best_model.joblib')
+preprocessors = load_preprocessors('models/preprocessors.joblib')
+
+# New patient data
+patient = {
+    'Pregnancies': 2,
+    'Glucose': 120,
+    'BloodPressure': 70,
+    'SkinThickness': 25,
+    'Insulin': 100,
+    'BMI': 28.5,
+    'DiabetesPedigreeFunction': 0.5,
+    'Age': 33
+}
+
+# Preprocess and predict
+X_new = pd.DataFrame([patient])
+X_processed = apply_preprocessing(X_new, preprocessors)
+prediction = model.predict(X_processed)
+probability = model.predict_proba(X_processed)
+
+print(f"Prediction: {'Diabetes' if prediction[0] == 1 else 'No Diabetes'}")
+print(f"Confidence: {probability[0][1]:.1%}")
 ```
 
 ---
-
-## 📁 Project Structure
-
-```text
-lab2/
-├── .python-version          # Python version specification
-├── pyproject.toml          # Project configuration & dependencies
-├── README.md               # This file
-├── main.py                 # Streamlit web application
-├── regression.py           # Legacy regression implementation (deprecated)
-│
-├── src/                    # Core package
-│   ├── __init__.py        # Package initialization
-│   ├── config.py          # Configuration management
-│   ├── data_cleaning.py   # Data loading & preprocessing
-│   ├── models.py          # ML model creation & evaluation
-│   └── utils.py           # Utility functions
-│
-├── scripts/               # Training scripts
-│   ├── train_classification.py
-│   └── train_regression.py
-│
-├── models/                # Trained model artifacts
-│   ├── classification_model.joblib
-│   └── regression_model.joblib
-│
-├── data/                  # Datasets
-│   ├── diabetes.csv      # PIMA Indians Diabetes Dataset
-│   └── house-data.csv    # Boston Housing Dataset
-│
-├── data-training/         # Legacy training files (deprecated)
-│   ├── classification.py
-│   └── regression.py
-│
-└── docs/                  # Documentation
-```
-
----
-
-## 🤖 Models & Datasets
-
-### Classification Model
-
-- **Algorithm**: Logistic Regression with Standard Scaling
-- **Dataset**: PIMA Indians Diabetes Dataset (768 samples, 8 features)
-- **Evaluation**: K-Fold vs Leave-One-Out Cross-Validation
-- **Performance**: ~77% accuracy with ROC AUC > 0.8
-
-### Regression Model
-
-- **Algorithm**: Linear Regression with Imputation and Scaling
-- **Dataset**: Boston Housing Dataset (506 samples, 13 features)
-- **Evaluation**: Repeated K-Fold Cross-Validation (10×3)
-- **Performance**: R² ~0.70, MAE ~$3,400
-
-### Dataset Sources
-
-- **Diabetes Data**: [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/34/diabetes)
-- **Housing Data**: [Scikit-learn Boston Housing](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_boston.html)
-
----
-
-## 📚 API Reference
-
-### Configuration (`src.config`)
-
-```python
-from src.config import Config
-
-# Access paths
-Config.DATA_DIR           # Data directory
-Config.DIABETES_DATA      # Diabetes dataset path
-Config.CLASSIFICATION_MODEL  # Classification model path
-
-# Access parameters
-Config.RANDOM_STATE       # Random seed
-Config.CV_FOLDS          # Cross-validation folds
-```
-
-### Data Cleaning (`src.data_cleaning`)
-
-```python
-from src.data_cleaning import load_diabetes_data, load_housing_data
-
-# Load datasets
-X_diabetes, y_diabetes = load_diabetes_data(filepath)
-X_housing, y_housing = load_housing_data(filepath)
-```
-
-### Models (`src.models`)
-
-```python
-from src.models import create_classification_pipeline, evaluate_classification_model
-
-# Create pipelines
-clf_pipeline = create_classification_pipeline()
-reg_pipeline = create_regression_pipeline()
-
-# Evaluate models
 metrics = evaluate_classification_model(pipeline, X, y)
-results = evaluate_regression_model(pipeline, X, y)
 ```
 
 ### Utilities (`src.utils`)
@@ -306,63 +248,28 @@ setup_logging(level='INFO', log_file='training.log')
 uv venv
 
 # Activate environment
-source .venv/bin/activate  # Linux/Mac
-# or
-.venv\Scripts\activate     # Windows
+## Contributing
 
-# Install dependencies
-uv sync
+We welcome contributions! Guidelines:
 
-# Install in development mode
-uv pip install -e .
-```
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/name`)
+3. Commit changes with clear messages
+4. Push and open a Pull Request
 
-### Code Quality
+Follow PEP 8, add type hints, update docs, maintain modular architecture.
 
-```bash
-# Run tests (if implemented)
-uv run pytest
+## License
 
-# Type checking
-uv run mypy src/
+MIT License - See [LICENSE](LICENSE) file for details.
 
-# Linting
-uv run flake8 src/
+## Authors
 
-# Formatting
-uv run black src/
-uv run isort src/
-```
+**Nilmar Pesaras** - *ITD105 Big Data Analytics Project*
 
-### Adding New Features
+## Acknowledgments
 
-1. **Data Processing**: Add functions to `src/data_cleaning.py`
-2. **Model Logic**: Add functions to `src/models.py`
-3. **Configuration**: Update `src/config.py`
-4. **Utilities**: Add helpers to `src/utils.py`
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please follow these steps:
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
-
-### Guidelines
-
-- Follow PEP 8 style guidelines
-- Add type hints for new functions
-- Update documentation for API changes
-- Test your changes thoroughly
-- Keep the modular architecture intact
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- PIMA Indians Diabetes Dataset from UCI ML Repository
+- scikit-learn team for ML algorithms
+- Streamlit for web framework
+- Astral team for uv package manager
