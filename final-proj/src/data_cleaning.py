@@ -5,7 +5,7 @@ Data loading and initial quality inspection functions.
 import pandas as pd
 import numpy as np
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Optional
 import logging
 
 logger = logging.getLogger(__name__)
