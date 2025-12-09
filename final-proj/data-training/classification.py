@@ -5,7 +5,6 @@ PIMA Indians Diabetes Dataset - Binary Classification
 """
 
 import pandas as pd
-import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
@@ -30,7 +29,7 @@ print("="*80)
 
 # Load the diabetes dataset
 df = pd.read_csv('diabetes.csv')
-print(f"\n📊 Dataset loaded successfully!")
+print("\n📊 Dataset loaded successfully!")
 print(f"   Shape: {df.shape}")
 print(f"   Features: {df.columns.tolist()}")
 
@@ -52,7 +51,7 @@ pipeline = Pipeline([
     ('classifier', LogisticRegression(max_iter=1000, random_state=42))
 ])
 
-print(f"\n🔧 Pipeline created: StandardScaler → LogisticRegression")
+print("\n🔧 Pipeline created: StandardScaler → LogisticRegression")
 
 # =============================================================================
 # 4. MODEL A - K-FOLD CROSS-VALIDATION (n_splits=10)
@@ -72,15 +71,15 @@ roc_auc_kfold = roc_auc_score(y, y_pred_proba_kfold[:, 1])
 cm_kfold = confusion_matrix(y, y_pred_kfold)
 cr_kfold = classification_report(y, y_pred_kfold)
 
-print(f"\n📈 Performance Metrics (Model A):")
+print("\n📈 Performance Metrics (Model A):")
 print(f"   Classification Accuracy: {accuracy_kfold:.4f}")
 print(f"   Logarithmic Loss: {logloss_kfold:.4f}")
 print(f"   Area Under ROC Curve: {roc_auc_kfold:.4f}")
 
-print(f"\n🔢 Confusion Matrix:")
+print("\n🔢 Confusion Matrix:")
 print(f"   {cm_kfold}")
 
-print(f"\n📋 Classification Report:")
+print("\n📋 Classification Report:")
 print(cr_kfold)
 
 # =============================================================================
@@ -104,15 +103,15 @@ roc_auc_loo = roc_auc_score(y, y_pred_proba_loo[:, 1])
 cm_loo = confusion_matrix(y, y_pred_loo)
 cr_loo = classification_report(y, y_pred_loo)
 
-print(f"\n📈 Performance Metrics (Model B):")
+print("\n📈 Performance Metrics (Model B):")
 print(f"   Classification Accuracy: {accuracy_loo:.4f}")
 print(f"   Logarithmic Loss: {logloss_loo:.4f}")
 print(f"   Area Under ROC Curve: {roc_auc_loo:.4f}")
 
-print(f"\n🔢 Confusion Matrix:")
+print("\n🔢 Confusion Matrix:")
 print(f"   {cm_loo}")
 
-print(f"\n📋 Classification Report:")
+print("\n📋 Classification Report:")
 print(cr_loo)
 
 # =============================================================================
@@ -122,7 +121,7 @@ print("\n" + "="*80)
 print("MODEL COMPARISON & SELECTION")
 print("="*80)
 
-print(f"\n📊 Side-by-Side Comparison:")
+print("\n📊 Side-by-Side Comparison:")
 print(f"{'Metric':<30} {'Model A (K-Fold)':<20} {'Model B (LOOCV)':<20}")
 print("-" * 70)
 print(f"{'Accuracy':<30} {accuracy_kfold:<20.4f} {accuracy_loo:<20.4f}")
@@ -186,9 +185,9 @@ print(f"✅ Model saved as: {model_filename}")
 print("\n" + "="*80)
 print("✨ CLASSIFICATION TASK COMPLETED SUCCESSFULLY!")
 print("="*80)
-print(f"\n📦 Next Steps:")
+print("\n📦 Next Steps:")
 print(f"   1. Use '{model_filename}' in your Streamlit application")
 print(f"   2. Load with: model = joblib.load('{model_filename}')")
-print(f"   3. Make predictions with: model.predict(new_data)")
+print("   3. Make predictions with: model.predict(new_data)")
 print("="*80)
 
