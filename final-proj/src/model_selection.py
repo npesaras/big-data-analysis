@@ -8,19 +8,30 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def create_all_models(models_config: Dict[str, Dict]) -> Dict[str, Any]:
+def create_all_models(models_config: Dict[str, Dict], k_neighbors: int = None) -> Dict[str, Any]:
     """
     Create instances of all classification models with configured hyperparameters.
 
     Args:
         models_config: Dictionary containing model configurations from config.py
+        k_neighbors: Optional override for K-Nearest Neighbors n_neighbors parameter
 
     Returns:
         Dictionary mapping model names to instantiated model objects
     """
+    # Clone the config to avoid modifying the original
+    import copy
+    models_config_copy = copy.deepcopy(models_config)
+    
+    # Update KNN k_neighbors if provided
+    if k_neighbors is not None:
+        if 'K-Nearest Neighbors' in models_config_copy:
+            models_config_copy['K-Nearest Neighbors']['params']['n_neighbors'] = k_neighbors
+            logger.info(f"Updated KNN n_neighbors to {k_neighbors}")
+    
     models = {}
 
-    for model_name, config in models_config.items():
+    for model_name, config in models_config_copy.items():
         try:
             model_class = config['class']
             params = config['params']

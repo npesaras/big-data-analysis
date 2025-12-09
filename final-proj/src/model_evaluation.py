@@ -423,3 +423,112 @@ def get_evaluation_summary(eval_results: Dict[str, Dict]) -> Dict:
                 f"Avg Recall: {summary['avg_recall']:.4f}")
 
     return summary
+
+
+def create_prediction_comparison_df(
+    eval_results: Dict[str, Dict],
+    patient_predictions: Dict[str, Dict]
+) -> pd.DataFrame:
+    """
+    Create a comprehensive comparison table showing all models' performance
+    and their predictions for the patient.
+
+    Args:
+        eval_results: Dictionary with evaluation results for all models
+        patient_predictions: Dictionary with predictions for patient from all models
+
+    Returns:
+        DataFrame with columns: Rank, Model, Test Accuracy, Prediction,
+                                Diabetes Prob, Confidence
+    """
+    comparison_data = []
+
+    for model_name in eval_results.keys():
+        if 'error' in eval_results[model_name]:
+            continue
+
+        eval_res = eval_results[model_name]
+        pred_res = patient_predictions.get(model_name, {})
+
+        row = {
+            'Model': model_name,
+            'Test Accuracy': eval_res.get('accuracy', 0),
+            'Prediction': pred_res.get('prediction_label', 'N/A'),
+            'Diabetes Prob': pred_res.get('diabetes_probability', 0) if pred_res.get('diabetes_probability') is not None else 0,
+            'Confidence': pred_res.get('confidence', 0) if pred_res.get('confidence') is not None else 0
+        }
+        comparison_data.append(row)
+
+    df = pd.DataFrame(comparison_data)
+
+    # Sort by test accuracy
+    df = df.sort_values('Test Accuracy', ascending=False).reset_index(drop=True)
+    df.index = df.index + 1
+    df.index.name = 'Rank'
+
+    logger.info(f"Prediction comparison table created with {len(df)} models")
+
+    return df
+
+
+def plot_diabetes_probability_chart(patient_predictions: Dict[str, Dict]):
+    """
+    Create a bar chart showing diabetes probability across all algorithms
+    with a 50% threshold line.
+
+    Args:
+        patient_predictions: Dictionary with predictions for patient from all models
+
+    Returns:
+        Plotly figure object
+    """
+    # Extract data for models that support probability predictions
+    model_names = []
+    diabetes_probs = []
+    colors = []
+
+    for model_name, pred_data in patient_predictions.items():
+        if pred_data.get('diabetes_probability') is not None:
+            model_names.append(model_name)
+            prob = pred_data['diabetes_probability']
+            diabetes_probs.append(prob)
+
+            # Color based on prediction
+            if pred_data['prediction'] == 1:
+                colors.append('#ff4444')  # Red for diabetic
+            else:
+                colors.append('#44ff44')  # Green for healthy
+
+    # Create bar chart
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        x=model_names,
+        y=diabetes_probs,
+        marker=dict(color=colors),
+        text=[f"{p:.1f}%" for p in diabetes_probs],
+        textposition='outside',
+        name='Diabetes Probability'
+    ))
+
+    # Add 50% threshold line
+    fig.add_hline(
+        y=50,
+        line_dash="dash",
+        line_color="yellow",
+        annotation_text="50% Threshold",
+        annotation_position="right"
+    )
+
+    fig.update_layout(
+        title='Diabetes Probability by Algorithm',
+        xaxis_title='Algorithm',
+        yaxis_title='Diabetes Probability (%)',
+        yaxis=dict(range=[0, 100]),
+        height=450,
+        showlegend=False
+    )
+
+    logger.info("Diabetes probability chart created")
+
+    return fig
