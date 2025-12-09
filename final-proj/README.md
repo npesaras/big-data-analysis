@@ -31,6 +31,9 @@ cd big-data-analysis/final-proj
 # Install uv package manager
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
+# change directory to final-proj
+cd big-data-analysis/final-proj
+
 # Install dependencies
 
 uv sync
