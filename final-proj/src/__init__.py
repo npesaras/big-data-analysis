@@ -1,10 +1,20 @@
 """
-ITD105 - Big Data Analytics Lab Exercise #2
-Machine Learning Model Deployment Package
-
-This package provides separated data cleaning and model training
-functionality for diabetes classification and housing price regression.
+Diabetes Classification System - Source Package
+A complete machine learning pipeline for diabetes prediction using the PIMA Indians dataset.
 """
 
-__version__ = "1.0.0"
-__author__ = "Nilmar Pesaras"
+__version__ = "2.0.0"
+__author__ = "Big Data Analysis Team"
+
+# Package metadata
+__all__ = [
+    'config',
+    'utils',
+    'data_cleaning',
+    'exploratory_data_analysis',
+    'pre_processing',
+    'data_splitting',
+    'model_selection',
+    'model_training',
+    'model_evaluation'
+]

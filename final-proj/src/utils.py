@@ -1,143 +1,154 @@
 """
-Utility functions for Lab 2 ML pipeline.
-
-This module provides helper functions for logging, file operations,
-and other common utilities.
+Utility functions for model persistence and directory management.
 """
 
-import logging
 import joblib
+import logging
 from pathlib import Path
-from typing import Any
-import sys
+from typing import Any, Optional
+from datetime import datetime
 
-def setup_logging(level: str = 'INFO', log_file: str = None) -> None:
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+
+def ensure_directory(directory_path: Path) -> None:
+    """
+    Ensure that a directory exists, create it if it doesn't.
+
+    Args:
+        directory_path: Path to the directory
+    """
+    directory_path.mkdir(parents=True, exist_ok=True)
+    logger.info(f"Directory ensured: {directory_path}")
+
+
+def save_model(model: Any, filepath: Path, model_name: str = "model") -> bool:
+    """
+    Save a trained model to disk using joblib.
+
+    Args:
+        model: The trained model object
+        filepath: Path where the model should be saved
+        model_name: Name of the model for logging
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        ensure_directory(filepath.parent)
+        joblib.dump(model, filepath)
+        logger.info(f"Model '{model_name}' saved successfully to {filepath}")
+        return True
+    except Exception as e:
+        logger.error(f"Error saving model '{model_name}': {str(e)}")
+        return False
+
+
+def load_model(filepath: Path, model_name: str = "model") -> Optional[Any]:
+    """
+    Load a trained model from disk.
+
+    Args:
+        filepath: Path to the saved model
+        model_name: Name of the model for logging
+
+    Returns:
+        The loaded model object, or None if loading fails
+    """
+    try:
+        if not filepath.exists():
+            logger.error(f"Model file not found: {filepath}")
+            return None
+
+        model = joblib.load(filepath)
+        logger.info(f"Model '{model_name}' loaded successfully from {filepath}")
+        return model
+    except Exception as e:
+        logger.error(f"Error loading model '{model_name}': {str(e)}")
+        return None
+
+
+def save_preprocessors(imputer: Any, scaler: Any, models_dir: Path) -> bool:
+    """
+    Save preprocessing objects (imputer and scaler).
+
+    Args:
+        imputer: The fitted imputer object
+        scaler: The fitted scaler object
+        models_dir: Directory where preprocessors should be saved
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        ensure_directory(models_dir)
+        imputer_path = models_dir / "imputer.joblib"
+        scaler_path = models_dir / "scaler.joblib"
+
+        joblib.dump(imputer, imputer_path)
+        joblib.dump(scaler, scaler_path)
+
+        logger.info(f"Preprocessors saved to {models_dir}")
+        return True
+    except Exception as e:
+        logger.error(f"Error saving preprocessors: {str(e)}")
+        return False
+
+
+def load_preprocessors(models_dir: Path) -> tuple:
+    """
+    Load preprocessing objects (imputer and scaler).
+
+    Args:
+        models_dir: Directory where preprocessors are saved
+
+    Returns:
+        tuple: (imputer, scaler) or (None, None) if loading fails
+    """
+    try:
+        imputer_path = models_dir / "imputer.joblib"
+        scaler_path = models_dir / "scaler.joblib"
+
+        if not imputer_path.exists() or not scaler_path.exists():
+            logger.error("Preprocessor files not found")
+            return None, None
+
+        imputer = joblib.load(imputer_path)
+        scaler = joblib.load(scaler_path)
+
+        logger.info("Preprocessors loaded successfully")
+        return imputer, scaler
+    except Exception as e:
+        logger.error(f"Error loading preprocessors: {str(e)}")
+        return None, None
+
+
+def get_timestamp() -> str:
+    """
+    Get current timestamp as a formatted string.
+
+    Returns:
+        str: Formatted timestamp
+    """
+    return datetime.now().strftime("%Y%m%d_%H%M%S")
+
+
+def setup_logging(log_level: str = "INFO") -> None:
     """
     Setup logging configuration.
 
     Args:
-        level: Logging level (DEBUG, INFO, WARNING, ERROR)
-        log_file: Optional log file path
+        log_level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     """
-    # Create logger
-    logger = logging.getLogger()
-    logger.setLevel(getattr(logging, level.upper()))
-
-    # Remove existing handlers
-    for handler in logger.handlers[:]:
-        logger.removeHandler(handler)
-
-    # Create formatter
-    formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    numeric_level = getattr(logging, log_level.upper(), logging.INFO)
+    logging.basicConfig(
+        level=numeric_level,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        force=True
     )
-
-    # Console handler
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-
-    # File handler (optional)
-    if log_file:
-        ensure_directory(log_file)
-        file_handler = logging.FileHandler(log_file)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-
-def ensure_directory(filepath: str) -> None:
-    """
-    Ensure the directory for a file path exists.
-
-    Args:
-        filepath: File path (directory will be created if needed)
-    """
-    Path(filepath).parent.mkdir(parents=True, exist_ok=True)
-
-def save_model(model: Any, filepath: str) -> None:
-    """
-    Save a model to disk with proper error handling.
-
-    Args:
-        model: Model object to save
-        filepath: Path where to save the model
-    """
-    try:
-        ensure_directory(filepath)
-        joblib.dump(model, filepath)
-        print(f"✅ Model saved successfully to {filepath}")
-    except Exception as e:
-        print(f"❌ Error saving model to {filepath}: {e}")
-        raise
-
-def load_model(filepath: str) -> Any:
-    """
-    Load a model from disk with proper error handling.
-
-    Args:
-        filepath: Path to the saved model
-
-    Returns:
-        Loaded model object
-
-    Raises:
-        FileNotFoundError: If model file doesn't exist
-    """
-    try:
-        if not Path(filepath).exists():
-            raise FileNotFoundError(f"Model file not found: {filepath}")
-
-        model = joblib.load(filepath)
-        print(f"✅ Model loaded successfully from {filepath}")
-        return model
-    except Exception as e:
-        print(f"❌ Error loading model from {filepath}: {e}")
-        raise
-
-def validate_file_exists(filepath: str, description: str = "file") -> None:
-    """
-    Validate that a file exists.
-
-    Args:
-        filepath: Path to check
-        description: Description of the file for error messages
-
-    Raises:
-        FileNotFoundError: If file doesn't exist
-    """
-    if not Path(filepath).exists():
-        raise FileNotFoundError(f"{description} not found: {filepath}")
-
-def print_header(title: str, width: int = 80) -> None:
-    """
-    Print a formatted header.
-
-    Args:
-        title: Header text
-        width: Width of the header
-    """
-    print("\n" + "="*width)
-    print(f"{title:^{width}}")
-    print("="*width)
-
-def print_section(title: str) -> None:
-    """
-    Print a section header.
-
-    Args:
-        title: Section title
-    """
-    print(f"\n{title}")
-    print("-" * len(title))
-
-def format_number(num: float, decimals: int = 4) -> str:
-    """
-    Format a number for display.
-
-    Args:
-        num: Number to format
-        decimals: Number of decimal places
-
-    Returns:
-        Formatted string
-    """
-    return f"{num:.{decimals}f}"
+    logger.info(f"Logging configured at {log_level} level")

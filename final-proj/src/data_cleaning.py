@@ -1,131 +1,209 @@
 """
-Data loading and preprocessing functions for Lab 2.
-
-This module separates data cleaning logic from model training,
-providing reusable functions for loading and preprocessing datasets.
+Data loading and initial quality inspection functions.
 """
 
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler
-from sklearn.impute import SimpleImputer
-from sklearn.pipeline import Pipeline
-from typing import Tuple
+from pathlib import Path
+from typing import Dict, List, Tuple, Optional
 import logging
 
 logger = logging.getLogger(__name__)
 
-def load_diabetes_data(filepath: str) -> Tuple[pd.DataFrame, pd.Series]:
+
+def load_diabetes_data(filepath: Path) -> Optional[pd.DataFrame]:
     """
-    Load and perform initial preprocessing of diabetes dataset.
+    Load the diabetes dataset from CSV file.
 
     Args:
         filepath: Path to the diabetes.csv file
 
     Returns:
-        Tuple of (features DataFrame, target Series)
+        DataFrame containing the diabetes data, or None if loading fails
     """
     try:
-        logger.info(f"Loading diabetes data from {filepath}")
+        if not filepath.exists():
+            logger.error(f"Data file not found: {filepath}")
+            return None
+
         df = pd.read_csv(filepath)
-
-        # Basic validation
-        if 'Outcome' not in df.columns:
-            raise ValueError("Diabetes dataset must contain 'Outcome' column")
-
-        # Split features and target
-        X = df.drop('Outcome', axis=1)
-        y = df['Outcome']
-
-        logger.info(f"Diabetes data loaded: {X.shape[0]} samples, {X.shape[1]} features")
-        logger.info(f"Class distribution: {y.value_counts().to_dict()}")
-
-        return X, y
-
-    except FileNotFoundError:
-        logger.error(f"Diabetes data file not found: {filepath}")
-        raise
+        logger.info(f"Data loaded successfully: {df.shape[0]} rows, {df.shape[1]} columns")
+        return df
     except Exception as e:
-        logger.error(f"Error loading diabetes data: {e}")
-        raise
+        logger.error(f"Error loading data: {str(e)}")
+        return None
 
-def load_housing_data(filepath: str) -> Tuple[pd.DataFrame, pd.Series]:
+
+def inspect_data(df: pd.DataFrame) -> Dict:
     """
-    Load and perform initial preprocessing of housing dataset.
+    Perform initial data inspection and return summary statistics.
 
     Args:
-        filepath: Path to the house-data.csv file
+        df: Input DataFrame
 
     Returns:
-        Tuple of (features DataFrame, target Series)
+        Dictionary containing data inspection results
     """
-    try:
-        logger.info(f"Loading housing data from {filepath}")
-        df = pd.read_csv(filepath)
+    inspection = {
+        'shape': df.shape,
+        'columns': list(df.columns),
+        'dtypes': df.dtypes.to_dict(),
+        'missing_values': df.isnull().sum().to_dict(),
+        'missing_percentage': (df.isnull().sum() / len(df) * 100).to_dict(),
+        'duplicates': df.duplicated().sum(),
+        'summary_stats': df.describe().to_dict()
+    }
 
-        # Basic validation
-        if 'MEDV' not in df.columns:
-            raise ValueError("Housing dataset must contain 'MEDV' column")
+    logger.info(f"Data inspection complete - Shape: {inspection['shape']}, "
+                f"Duplicates: {inspection['duplicates']}")
 
-        # Split features and target
-        X = df.drop('MEDV', axis=1)
-        y = df['MEDV']
+    return inspection
 
-        # Check for missing values
-        missing_counts = X.isnull().sum()
-        if missing_counts.sum() > 0:
-            logger.warning(f"Missing values detected: {missing_counts[missing_counts > 0].to_dict()}")
 
-        logger.info(f"Housing data loaded: {X.shape[0]} samples, {X.shape[1]} features")
-        logger.info(f"Target range: ${y.min():.1f}k - ${y.max():.1f}k (median: ${y.mean():.1f}k)")
-
-        return X, y
-
-    except FileNotFoundError:
-        logger.error(f"Housing data file not found: {filepath}")
-        raise
-    except Exception as e:
-        logger.error(f"Error loading housing data: {e}")
-        raise
-
-def create_preprocessing_pipeline() -> Pipeline:
+def identify_zero_issues(df: pd.DataFrame, cols_to_check: List[str]) -> Dict:
     """
-    Create a reusable preprocessing pipeline.
-
-    Returns:
-        sklearn Pipeline with imputation and scaling
-    """
-    pipeline = Pipeline([
-        ('imputer', SimpleImputer(strategy='median')),
-        ('scaler', StandardScaler())
-    ])
-
-    logger.info("Created preprocessing pipeline: Imputer → Scaler")
-    return pipeline
-
-def validate_data(X: pd.DataFrame, y: pd.Series, task: str = "unknown") -> None:
-    """
-    Perform basic data validation.
+    Identify zero values in columns where zeros are biologically impossible.
 
     Args:
-        X: Features DataFrame
-        y: Target Series
-        task: Task name for logging
+        df: Input DataFrame
+        cols_to_check: List of column names to check for zero issues
 
-    Raises:
-        ValueError: If data validation fails
+    Returns:
+        Dictionary with zero value counts and percentages for each column
     """
-    if X.empty:
-        raise ValueError(f"Features data is empty for {task} task")
+    zero_issues = {}
 
-    if y.empty:
-        raise ValueError(f"Target data is empty for {task} task")
+    for col in cols_to_check:
+        if col in df.columns:
+            zero_count = (df[col] == 0).sum()
+            zero_percentage = (zero_count / len(df)) * 100
+            zero_issues[col] = {
+                'count': int(zero_count),
+                'percentage': round(zero_percentage, 2),
+                'is_issue': zero_count > 0
+            }
 
-    if len(X) != len(y):
-        raise ValueError(f"Features ({len(X)}) and target ({len(y)}) have different lengths")
+            if zero_count > 0:
+                logger.warning(f"Column '{col}' has {zero_count} ({zero_percentage:.2f}%) zero values")
 
-    # Check for NaN values in target
-    if y.isnull().any():
-        raise ValueError(f"Target contains NaN values for {task} task")
+    return zero_issues
 
-    logger.info(f"Data validation passed for {task} task")
+
+def get_data_quality_report(df: pd.DataFrame, target_column: str = 'Outcome') -> Dict:
+    """
+    Generate comprehensive data quality report.
+
+    Args:
+        df: Input DataFrame
+        target_column: Name of the target variable column
+
+    Returns:
+        Dictionary containing comprehensive quality metrics
+    """
+    report = {
+        'total_samples': len(df),
+        'total_features': len(df.columns) - 1,  # Exclude target
+        'data_types': df.dtypes.value_counts().to_dict(),
+        'memory_usage_mb': df.memory_usage(deep=True).sum() / 1024**2,
+    }
+
+    # Target variable analysis
+    if target_column in df.columns:
+        target_counts = df[target_column].value_counts().to_dict()
+        report['target_distribution'] = target_counts
+        report['class_balance_ratio'] = round(
+            max(target_counts.values()) / min(target_counts.values()), 2
+        )
+
+    # Feature statistics
+    numeric_cols = df.select_dtypes(include=[np.number]).columns
+    report['numeric_features'] = len(numeric_cols)
+    report['feature_ranges'] = {}
+
+    for col in numeric_cols:
+        if col != target_column:
+            report['feature_ranges'][col] = {
+                'min': float(df[col].min()),
+                'max': float(df[col].max()),
+                'mean': float(df[col].mean()),
+                'median': float(df[col].median()),
+                'std': float(df[col].std())
+            }
+
+    logger.info(f"Data quality report generated for {report['total_samples']} samples")
+
+    return report
+
+
+def detect_outliers_iqr(df: pd.DataFrame, columns: List[str],
+                        multiplier: float = 1.5) -> Dict[str, pd.Series]:
+    """
+    Detect outliers using the IQR (Interquartile Range) method.
+
+    Args:
+        df: Input DataFrame
+        columns: List of column names to check for outliers
+        multiplier: IQR multiplier (default 1.5 for standard outliers)
+
+    Returns:
+        Dictionary mapping column names to boolean Series indicating outliers
+    """
+    outliers = {}
+
+    for col in columns:
+        if col in df.columns:
+            Q1 = df[col].quantile(0.25)
+            Q3 = df[col].quantile(0.75)
+            IQR = Q3 - Q1
+
+            lower_bound = Q1 - multiplier * IQR
+            upper_bound = Q3 + multiplier * IQR
+
+            outlier_mask = (df[col] < lower_bound) | (df[col] > upper_bound)
+            outliers[col] = outlier_mask
+
+            outlier_count = outlier_mask.sum()
+            if outlier_count > 0:
+                logger.info(f"Column '{col}': {outlier_count} outliers detected "
+                           f"(bounds: {lower_bound:.2f} - {upper_bound:.2f})")
+
+    return outliers
+
+
+def get_column_statistics(df: pd.DataFrame, column: str) -> Dict:
+    """
+    Get detailed statistics for a specific column.
+
+    Args:
+        df: Input DataFrame
+        column: Name of the column
+
+    Returns:
+        Dictionary with detailed statistics
+    """
+    if column not in df.columns:
+        logger.error(f"Column '{column}' not found in DataFrame")
+        return {}
+
+    col_data = df[column]
+
+    stats = {
+        'count': int(col_data.count()),
+        'missing': int(col_data.isnull().sum()),
+        'unique': int(col_data.nunique()),
+        'dtype': str(col_data.dtype)
+    }
+
+    if col_data.dtype in [np.int64, np.float64]:
+        stats.update({
+            'mean': float(col_data.mean()),
+            'median': float(col_data.median()),
+            'std': float(col_data.std()),
+            'min': float(col_data.min()),
+            'max': float(col_data.max()),
+            'q25': float(col_data.quantile(0.25)),
+            'q75': float(col_data.quantile(0.75)),
+            'zeros': int((col_data == 0).sum())
+        })
+
+    return stats
