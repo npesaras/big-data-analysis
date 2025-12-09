@@ -1,6 +1,6 @@
 """
 Real-Time Dynamic ML Training System for Diabetes Classification
-Sidebar Input Version
+Final Version: Sidebar Inputs + Fixed Icon Warnings
 """
 
 import streamlit as st
@@ -65,6 +65,11 @@ st.markdown("""
     section[data-testid="stSidebar"] .block-container {
         padding-top: 1rem;
     }
+
+    /* Warning Box Styling */
+    .stAlert {
+        padding: 0.5rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -94,7 +99,7 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # ========= B. PATIENT DIAGNOSTICS (Moved Here) =========
+    # ========= B. PATIENT DIAGNOSTICS =========
     st.subheader("📋 Patient Diagnostics")
 
     with st.form("patient_data_form"):
@@ -134,9 +139,12 @@ with st.sidebar:
 
         st.markdown("---")
 
-        # Visual Validation Warning inside Sidebar
-        if glucose > 140: st.warning('⚠️ High Glucose', icon="⚠️")
-        if bmi >= 30.0: st.warning('⚠️ Obesity Risk', icon="⚠️")
+        # --- FIXED WARNINGS (Single Icon) ---
+        if glucose > 140:
+            st.warning('High Glucose Detected', icon="⚠️")
+        if bmi >= 30.0:
+            st.warning('Obesity Risk Indicated', icon="⚠️")
+        # ------------------------------------
 
         # Submit Button
         predict_button = st.form_submit_button(
@@ -198,7 +206,6 @@ if predict_button:
 
     # Display results
     if results['success']:
-        # We don't need columns here anymore, we let display_results use the full container
         with st.container(border=True):
             st.subheader("🎯 Analysis Report")
             display_results(results, patient_data, train_size / 100)
