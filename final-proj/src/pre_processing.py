@@ -82,7 +82,7 @@ def scale_features(X: pd.DataFrame) -> Tuple[pd.DataFrame, StandardScaler]:
         index=X.index
     )
 
-    logger.info(f"Features scaled using StandardScaler (mean=0, std=1)")
+    logger.info("Features scaled using StandardScaler (mean=0, std=1)")
 
     return X_scaled, scaler
 
