@@ -32,28 +32,23 @@ cd big-data-analysis/final-proj
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Install dependencies
+
 uv sync
+
+# use uv environment
+source .venv/bin/activate
 ```
 
 ### Run Application
 
 ```bash
 # Start Streamlit web app
-uv run streamlit run main.py
-```
-
-Open http://localhost:8501 in your browser.
-
-### Train Models
-
-```bash
-# Train classification models
-uv run python scripts/train_classification.py
+streamlit run main.py
 ```
 
 ## Project Structure
 
-```
+```txt
 final-proj/
 ├── main.py                  # Streamlit web application
 ├── data/
@@ -88,24 +83,13 @@ final-proj/
 ## Dataset
 
 **PIMA Indians Diabetes Database**
+
 - **Samples**: 768 female patients of Pima Indian heritage
 - **Features**: 8 clinical measurements (Pregnancies, Glucose, Blood Pressure, Skin Thickness, Insulin, BMI, Diabetes Pedigree Function, Age)
 - **Target**: Binary classification (0 = No Diabetes, 1 = Diabetes)
 - **Class Distribution**: 500 non-diabetic (65%) vs 268 diabetic (35%)
 - **Challenge**: Missing values encoded as zeros (Insulin: 49%, Skin Thickness: 30%)
 
-## Model Performance
-
-Best performing models (10-fold CV Recall):
-
-| Model | Recall | Accuracy | Training Time |
-|-------|--------|----------|---------------|
-| Random Forest | 78.1% | 77.8% | ~2s |
-| MLP | 75.2% | 76.1% | ~9s |
-| Gaussian NB | 74.5% | 75.3% | <0.1s |
-| Logistic Regression | 74.1% | 75.8% | <0.2s |
-
-*Recall prioritized to minimize false negatives in medical diagnosis*
 
 ## Technical Documentation
 
@@ -135,127 +119,6 @@ The Streamlit application provides diabetes risk prediction:
 - Get real-time diabetes risk assessment
 - View confidence scores and clinical interpretation
 
-### Programmatic Usage
-
-```python
-from src.config import Config
-from src.data_cleaning import load_diabetes_data
-from src.models import create_classification_pipeline
-from src.utils import load_model
-
-# Load configuration
-print(f"Data directory: {Config.DATA_DIR}")
-
-# Load and preprocess data
-X, y = load_diabetes_data(str(Config.DIABETES_DATA))
-
-# Create and train model
-pipeline = create_classification_pipeline()
-pipeline.fit(X, y)
-
-# Make predictions
-predictions = pipeline.predict(X)
-```
-## Key Technologies
-
-- **Python 3.13+**: Core language
-- **scikit-learn 1.7.2**: Machine learning algorithms
-- **Streamlit 1.51.0**: Web application framework
-- **Pandas 2.3.3**: Data manipulation
-- **Plotly 6.5.0**: Interactive visualizations
-- **uv**: Fast Python package manager (Rust-based)
-
-## Usage Examples
-
-### Load and Preprocess Data
-
-```python
-from src.data_cleaning import load_diabetes_data
-from src.pre_processing import preprocess_pipeline
-
-# Load raw data
-df = load_diabetes_data()
-
-# Complete preprocessing (zeros → NaN → impute → scale)
-df_processed, preprocessors = preprocess_pipeline(df)
-```
-
-### Train Multiple Models
-
-```python
-from src.model_selection import create_all_models
-from src.model_training import train_all_models
-
-# Create 9 models
-models = create_all_models()
-
-# Train with 10-fold CV
-results = train_all_models(X_train, y_train, cv_folds=10, scoring='recall')
-
-# View results
-for name, metrics in results.items():
-    print(f"{name}: {metrics['cv_mean']:.3f} (+/- {metrics['cv_std']:.3f})")
-```
-
-### Make Predictions
-
-```python
-from src.utils import load_model, load_preprocessors
-
-# Load trained model and preprocessors
-model = load_model('models/best_model.joblib')
-preprocessors = load_preprocessors('models/preprocessors.joblib')
-
-# New patient data
-patient = {
-    'Pregnancies': 2,
-    'Glucose': 120,
-    'BloodPressure': 70,
-    'SkinThickness': 25,
-    'Insulin': 100,
-    'BMI': 28.5,
-    'DiabetesPedigreeFunction': 0.5,
-    'Age': 33
-}
-
-# Preprocess and predict
-X_new = pd.DataFrame([patient])
-X_processed = apply_preprocessing(X_new, preprocessors)
-prediction = model.predict(X_processed)
-probability = model.predict_proba(X_processed)
-
-print(f"Prediction: {'Diabetes' if prediction[0] == 1 else 'No Diabetes'}")
-print(f"Confidence: {probability[0][1]:.1%}")
-```
-
----
-metrics = evaluate_classification_model(pipeline, X, y)
-```
-
-### Utilities (`src.utils`)
-
-```python
-from src.utils import load_model, save_model, setup_logging
-
-# Model persistence
-model = load_model(filepath)
-save_model(model, filepath)
-
-# Logging setup
-setup_logging(level='INFO', log_file='training.log')
-```
-
----
-
-## Development
-
-### Environment Setup
-
-```bash
-# Create virtual environment
-uv venv
-
-# Activate environment
 ## Contributing
 
 We welcome contributions! Guidelines:
