@@ -3,7 +3,6 @@ Data splitting functions with stratification for train-test and cross-validation
 """
 
 import pandas as pd
-import numpy as np
 from sklearn.model_selection import train_test_split, StratifiedKFold
 from typing import Tuple, Dict
 import logging
