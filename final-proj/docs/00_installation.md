@@ -373,7 +373,7 @@ rm -rf .venv
   ```bash
   # Ubuntu/Debian
   sudo apt-get install python3-dev
-  
+
   # Fedora
   sudo dnf install python3-devel
   ```
